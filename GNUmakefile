@@ -354,10 +354,10 @@ $(ada_src_dir)/stemmer-%.ads: algorithms/%.sbl snowball
 	@mkdir -p $(ada_src_dir)
 	./snowball $< -ada -P $* -o "$(ada_src_dir)/stemmer-$*"
 
-.PHONY: dist dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
+.PHONY: dist dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python dist_libstemmer_php
 
 # Make a full source distribution
-dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python
+dist: dist_snowball dist_libstemmer_c dist_libstemmer_csharp dist_libstemmer_java dist_libstemmer_js dist_libstemmer_python dist_libstemmer_php
 
 # Make a distribution of all the sources involved in snowball
 dist_snowball: $(COMPILER_SOURCES) $(COMPILER_HEADERS) \
@@ -514,7 +514,7 @@ dist_libstemmer_js: $(JS_SOURCES) $(COMMON_FILES)
 	rm -rf $${dest}
 
 dist_libstemmer_php: $(PHP_SOURCES) $(COMMON_FILES)
-	destname=phpstemmer-$(SNOWBALL_VERSION); \
+	destname=libstemmer_php-$(SNOWBALL_VERSION); \
 	dest=dist/$${destname}; \
 	rm -rf $${dest} && \
 	rm -f $${dest}$(tarball_ext) && \
