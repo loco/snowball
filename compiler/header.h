@@ -389,7 +389,7 @@ struct options {
     byte comments;
     byte js_esm;
     enc encoding;
-    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PASCAL, LANG_PYTHON, LANG_JAVASCRIPT, LANG_RUST, LANG_GO, LANG_ADA } make_lang;
+    enum { LANG_JAVA, LANG_C, LANG_CPLUSPLUS, LANG_CSHARP, LANG_PASCAL, LANG_PYTHON, LANG_JAVASCRIPT, LANG_PHP, LANG_RUST, LANG_GO, LANG_ADA } make_lang;
     const char * externals_prefix;
     const char * variables_prefix;
     const char * runtime_path;
@@ -453,6 +453,10 @@ extern void generate_program_python(struct generator * g);
 
 #ifndef DISABLE_JS
 extern void generate_program_js(struct generator * g);
+#endif
+
+#ifndef DISABLE_PHP
+extern void generate_program_php(struct generator * g);
 #endif
 
 #ifndef DISABLE_RUST

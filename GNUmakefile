@@ -35,6 +35,10 @@ js_runtime_dir = javascript
 js_sample_dir = sample
 NODE ?= nodejs
 
+php_output_dir = php_out
+php_runtime_dir = php
+PHP ?= php
+
 cargo ?= cargo
 cargoflags ?= --release
 rust_src_main_dir = rust/src
@@ -94,6 +98,7 @@ COMPILER_SOURCES = compiler/space.c \
 		   compiler/generator_csharp.c \
 		   compiler/generator_java.c \
 		   compiler/generator_js.c \
+		   compiler/generator_php.c \
 		   compiler/generator_pascal.c \
 		   compiler/generator_python.c \
 		   compiler/generator_rust.c \
@@ -123,6 +128,8 @@ CSHARP_STEMWORDS_SOURCES = csharp/Stemwords/Program.cs
 JS_RUNTIME_SOURCES = javascript/base-stemmer.js
 
 JS_SAMPLE_SOURCES = javascript/stemwords.js
+
+PHP_RUNTIME_SOURCES = php/base-stemmer.php
 
 PASCAL_RUNTIME_SOURCES = pascal/SnowballProgram.pas
 
@@ -169,6 +176,8 @@ PYTHON_SOURCES = $(libstemmer_algorithms:%=$(python_output_dir)/%_stemmer.py) \
 		 $(python_output_dir)/__init__.py
 JS_SOURCES = $(libstemmer_algorithms:%=$(js_output_dir)/%-stemmer.js) \
 	$(js_output_dir)/base-stemmer.js
+PHP_SOURCES = $(libstemmer_algorithms:%=$(php_output_dir)/%-stemmer.php) \
+	$(php_output_dir)/base-stemmer.php
 RUST_SOURCES = $(libstemmer_algorithms:%=$(rust_src_dir)/%_stemmer.rs)
 GO_SOURCES = $(libstemmer_algorithms:%=$(go_src_dir)/%_stemmer.go) \
 	$(go_src_main_dir)/stemwords/algorithms.go
@@ -210,6 +219,7 @@ clean:
 	      $(PASCAL_SOURCES) pascal/stemwords.dpr pascal/stemwords pascal/*.o pascal/*.ppu \
 	      $(PYTHON_SOURCES) \
 	      $(JS_SOURCES) \
+	      $(PHP_SOURCES) \
 	      $(RUST_SOURCES) \
 	      $(ADA_SOURCES) ada/bin/generate ada/bin/stemwords \
 	      stemtest$(EXEEXT) $(STEMTEST_OBJECTS) \
@@ -330,6 +340,14 @@ $(js_output_dir)/%-stemmer.js: algorithms/%.sbl snowball$(EXEEXT)
 
 $(js_output_dir)/base-stemmer.js: $(js_runtime_dir)/base-stemmer.js
 	@mkdir -p $(js_output_dir)
+	cp $< $@
+
+$(php_output_dir)/%-stemmer.php: algorithms/%.sbl snowball$(EXEEXT)
+	@mkdir -p $(php_output_dir)
+	./snowball $< -php -o "$(php_output_dir)/$*-stemmer"
+
+$(php_output_dir)/base-stemmer.php: $(php_runtime_dir)/base-stemmer.php
+	@mkdir -p $(php_output_dir)
 	cp $< $@
 
 $(ada_src_dir)/stemmer-%.ads: algorithms/%.sbl snowball
@@ -495,6 +513,22 @@ dist_libstemmer_js: $(JS_SOURCES) $(COMMON_FILES)
 	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
 	rm -rf $${dest}
 
+dist_libstemmer_php: $(PHP_SOURCES) $(COMMON_FILES)
+	destname=phpstemmer-$(SNOWBALL_VERSION); \
+	dest=dist/$${destname}; \
+	rm -rf $${dest} && \
+	rm -f $${dest}$(tarball_ext) && \
+	mkdir -p $${dest} && \
+	mkdir -p $${dest}/$(php_runtime_dir) && \
+	cp -a doc/libstemmer_php_README $${dest}/README.rst && \
+	cp -a $(COMMON_FILES) $${dest} && \
+	cp -a $(PHP_RUNTIME_SOURCES) $${dest}/$(php_runtime_dir) && \
+	cp -a $(PHP_SOURCES) $${dest}/$(php_runtime_dir) && \
+	(cd $${dest} && \
+	 ls README.rst $(COMMON_FILES) $(php_runtime_dir)/*.php > MANIFEST) && \
+	(cd dist && tar zcf $${destname}$(tarball_ext) $${destname}) && \
+	rm -rf $${dest}
+
 ###############################################################################
 # C
 ###############################################################################
@@ -654,6 +688,36 @@ check_js_%: $(STEMMING_DATA)/%
 	  rm tmp.in; \
 	else \
 	  $(NODE) javascript/stemwords.js -l $* -i $</voc.txt -o tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	else \
+	  $(DIFF) -u $</output.txt tmp.txt; \
+	fi
+	@rm tmp.txt
+
+###############################################################################
+# PHP
+###############################################################################
+
+.PHONY: php check_php do_check_php
+
+php: $(PHP_SOURCES)
+
+check_php: php
+	$(MAKE) do_check_php
+
+do_check_php: $(libstemmer_algorithms:%=check_php_%)
+
+check_php_%: export PHP_PATH=$(php_output_dir)
+check_php_%: $(STEMMING_DATA)/%
+	@echo "Checking output of $* stemmer for PHP"
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
+	  $(PHP) -f php/stemwords.php -- -l $* -i tmp.in -o tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  $(PHP) -f php/stemwords.php -- -l $* -i $</voc.txt -o tmp.txt; \
 	fi
 	@if test -f '$</output.txt.gz' ; then \
 	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \

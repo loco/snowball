@@ -22,6 +22,8 @@
 
 #define DEFAULT_JS_BASE_CLASS "BaseStemmer"
 
+#define DEFAULT_PHP_BASE_CLASS "BaseStemmer"
+
 #define DEFAULT_PYTHON_BASE_CLASS "BaseStemmer"
 
 static int eq(const char * s1, const char * s2) {
@@ -55,6 +57,9 @@ static void print_arglist(int exit_code) {
 #ifndef DISABLE_JS
                "  -js[=TYPE]                       generate Javascript (TYPE values:\n"
                "                                   esm global, default: global)\n"
+#endif
+#ifndef DISABLE_PHP
+               "  -php\n"
 #endif
 #ifndef DISABLE_RUST
                "  -rust\n"
@@ -180,6 +185,12 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                 } else {
                     fprintf(stderr, "Unknown Javascript type '%s'\n", s + 4);
                 }
+                continue;
+            }
+#endif
+#ifndef DISABLE_PHP
+            if (eq(s, "-php")) {
+                o->make_lang = LANG_PHP;
                 continue;
             }
 #endif
@@ -373,6 +384,11 @@ static int read_options(struct options * o, int argc, char * argv[]) {
             if (!o->parent_class_name)
                 o->parent_class_name = DEFAULT_JS_BASE_CLASS;
             break;
+        case LANG_PHP:
+            o->encoding = ENC_WIDECHARS;
+            if (!o->parent_class_name)
+                o->parent_class_name = DEFAULT_PHP_BASE_CLASS;
+            break;
         case LANG_PYTHON:
             o->encoding = ENC_WIDECHARS;
             if (!o->parent_class_name)
@@ -426,7 +442,8 @@ static int read_options(struct options * o, int argc, char * argv[]) {
                     new_name[0] = toupper(new_name[0]);
                     break;
                 case LANG_JAVASCRIPT:
-                case LANG_PYTHON: {
+                case LANG_PYTHON:
+                case LANG_PHP: {
                     /* Upper case initial letter and change each
                      * underscore+letter or hyphen+letter to an upper case
                      * letter.
@@ -569,6 +586,16 @@ extern int main(int argc, char * argv[]) {
                     o->output_src = get_output(s);
                     lose_s(s);
                     generate_program_js(g);
+                    fclose(o->output_src);
+                }
+#endif
+#ifndef DISABLE_PHP
+                if (o->make_lang == LANG_PHP) {
+                    byte * s = add_sz_to_s(0, output_base);
+                    s = add_literal_to_s(s, ".php");
+                    o->output_src = get_output(s);
+                    lose_s(s);
+                    generate_program_php(g);
                     fclose(o->output_src);
                 }
 #endif
