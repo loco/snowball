@@ -2,6 +2,9 @@
 /**
  * Manually converted from JavaScript:
  * https://github.com/snowballstem/snowball/blob/master/javascript/base-stemmer.js
+ * 
+ * Build a stemmer from Snowball, as follows:
+ * ~$ ./snowball algorithms/english.sbl -php -o php/english-stemmer
  */
 abstract class SnowballStemmer {
 
@@ -415,11 +418,8 @@ abstract class SnowballStemmer {
     public static function charCodeAt( string $s, int $offset ):int {
         $c = mb_substr($s,$offset,1,'UTF-8');
         if( '' === $c ){
-            printf("console.error( String(%s), String(%1\$s).charCodeAt(%d), -1 );\n", json_encode($s), $offset );
-            // throw new RangeException('Bad character offset');
-            return -1;
+            throw new RangeException('Bad character offset');
         }
-        // printf("console.log( String(%s), String(%1\$s).charCodeAt(%d) === %d );\n", json_encode($s), $offset, IntlChar::ord($c) );
         return IntlChar::ord($c);
     }
 
@@ -449,11 +449,6 @@ abstract class SnowballStemmer {
         $this->setCurrent($word);
         $this->stem();
         return $this->getCurrent();
-    }
-
-
-    public static function create( string $lang ):static {
-        return new ( 'Snowball'.ucfirst($lang).'Stemmer' );
     }
     
     
