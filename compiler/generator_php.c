@@ -566,10 +566,10 @@ static void generate_loop(struct generator * g, struct node * p) {
     struct str * loopvar = vars_newname(g);
     write_comment(g, p);
     g->B[0] = str_data(loopvar);
-    w(g, "~Mfor ($~B0 = ");
+    w(g, "~Mfor (~B0 = ");
     generate_AE(g, p->AE);
     g->B[0] = str_data(loopvar);
-    writef(g, "; $~B0 > 0; $~B0--)~N", p);
+    writef(g, "; ~B0 > 0; ~B0--)~N", p);
     writef(g, "~{", p);
 
     generate(g, p->left);
@@ -596,7 +596,7 @@ static void generate_repeat_or_atleast(struct generator * g, struct node * p, st
     if (!g->unreachable) {
         if (loopvar != 0) {
             g->B[0] = str_data(loopvar);
-            w(g, "~M$~B0--;~N");
+            w(g, "~M~B0--;~N");
         }
 
         w(g, "~Mcontinue;~N");
@@ -622,7 +622,7 @@ static void generate_atleast(struct generator * g, struct node * p) {
     write_comment(g, p);
     w(g, "~{");
     g->B[0] = str_data(loopvar);
-    w(g, "~M$~B0 = ");
+    w(g, "~M~B0 = ");
     generate_AE(g, p->AE);
     w(g, ";~N");
     {
@@ -636,7 +636,7 @@ static void generate_atleast(struct generator * g, struct node * p) {
         g->failure_str = a1;
     }
     g->B[0] = str_data(loopvar);
-    write_failure_if(g, "$~B0 > 0", p);
+    write_failure_if(g, "~B0 > 0", p);
     w(g, "~}");
     str_delete(loopvar);
 }
@@ -858,7 +858,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
         g->unreachable = false;
 
         g->B[0] = str_data(varname);
-        w(g, "~M$~B0 = ");
+        w(g, "~M~B0 = ");
         if (p->mode == m_forward) {
             w(g, "$this->limit - $this->cursor;~N");
             w(g, "~M$this->limit = ");
@@ -883,7 +883,7 @@ static void generate_setlimit(struct generator * g, struct node * p) {
 
         if (!g->unreachable) {
             g->B[0] = str_data(varname);
-            w(g, "~M$~B0 = ");
+            w(g, "~M~B0 = ");
             if (p->mode == m_forward) {
                 w(g, "$this->limit - $this->cursor;~N");
                 w(g, "~M$this->limit = $this->cursor;~N");
