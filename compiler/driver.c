@@ -22,7 +22,7 @@
 
 #define DEFAULT_JS_BASE_CLASS "BaseStemmer"
 
-#define DEFAULT_PHP_BASE_CLASS "BaseStemmer"
+#define DEFAULT_PHP_BASE_CLASS "SnowballStemmer"
 
 #define DEFAULT_PYTHON_BASE_CLASS "BaseStemmer"
 
