@@ -48,12 +48,12 @@ static void write_hexdigit(struct generator * g, int n) {
 }
 
 static void write_hex(struct generator * g, int ch) {
-    // TODO PHP uncode stye {\uxxxx} 
-    write_string(g, "\\u");
+    write_string(g, "\\u{");
     {
         int i;
         for (i = 12; i >= 0; i -= 4) write_hexdigit(g, ch >> i & 0xf);
     }
+    write_string(g, "}");
 }
 
 static void write_literal_string(struct generator * g, symbol * p) {
@@ -765,8 +765,8 @@ static void generate_sliceto(struct generator * g, struct node * p) {
 
     write_comment(g, p);
     g->V[0] = p->name;
-    writef(g, "~M$~V0 = $this->slice_to(/*TODO should ~V0 be a class member?*/);~N"
-              "~Mif ( '' === $~V0 )~N"
+    writef(g, "~M$this->~V0 = $this->slice_to();~N"
+              "~Mif ( '' === $this->~V0 )~N"
               "~M{~N"
               "~+~Mreturn false;~N~-"
               "~M}~N", p);
@@ -991,12 +991,12 @@ static void generate_call(struct generator * g, struct node * p) {
     if (g->failure_keep_count == 0 && g->failure_label == x_return &&
         (signals == 0 || (p->right && p->right->type == c_functionend))) {
         /* Always fails or tail call. */
-        writef(g, "~Mreturn ~V0(/*TODO 979*/);~N", p);
+        writef(g, "~Mreturn $this->~V0();~N", p);
         return;
     }
     if (signals == 1) {
         /* Always succeeds. */
-        writef(g, "~M$tid0-~V0(); /*TODO 984*/ ~N", p);
+        writef(g, "~M$tid0-$this->~V0();~N", p);
     } else if (signals == 0) {
         /* Always fails. */
         writef(g, "~M$this->~V0();~N", p);
@@ -1200,11 +1200,9 @@ static void generate(struct generator * g, struct node * p) {
         case c_minusassign:   generate_integer_assign(g, p, "-="); break;
         case c_multiplyassign:generate_integer_assign(g, p, "*="); break;
         case c_divideassign:
-            /* Snowball specifies integer division with semantics matching C,
-             * so we need to use `Math.trunc(x/y)` here.
-             */
+            /* Snowball specifies integer division with semantics matching C */
             g->V[0] = p->name;
-            w(g, "~M~V0 = /*TODO 1192*/Math.trunc(~V0 / ");
+            w(g, "~M$this->~V0 = (int) floor( (float) $this->~V0 / (float) ");
             generate_AE(g, p->AE);
             w(g, ");~N");
             break;
@@ -1238,8 +1236,7 @@ static void generate(struct generator * g, struct node * p) {
 }
 
 static void generate_class_begin(struct generator * g) {
-    w(g, "// require_once __DIR__.'/base-stemmer.php';~N~N"
-         "class Snowball~n extends SnowballStemmer {~N~N~+");
+    w(g, "class Snowball~n extends SnowballStemmer {~N~N~+");
 }
 
 static void generate_class_end(struct generator * g) {
@@ -1346,10 +1343,12 @@ static void generate_methods(struct generator * g) {
 
 static void generate_label_classes(struct generator * g) {
     int i;
-    w(g, "~N// Exception classes (modelled on the Python generator) because PHP cannot label break levels~N" );
+    w(g, "~N// Exception classes (modelled on the Python generator) because PHP cannot label break levels~N~N" );
     for (i = 0; i <= g->max_label; i++) {
         g->I[0] = i;
-        w(g, "~N/** @internal */~Nclass _BreakLab~I0 extends Exception {}~N");
+        w(g, "if( ! class_exists('_BreakLab~I0',false) ){~N~+");
+        w(g, "~Mclass _BreakLab~I0 extends Exception {}~N");
+        w(g, "~-}~N");
     }
 }
 
