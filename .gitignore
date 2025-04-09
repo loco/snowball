@@ -18,9 +18,11 @@
 /js_out
 /python_check
 /python_out
+/php_out
 *.generated.cs
 /rust/Cargo.lock
 /rust/src/snowball/algorithms/*.rs
 /rust/target/
 /go/algorithms/
 /go/stemwords/algorithms.go
+.DS_Store
