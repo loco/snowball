@@ -56,7 +56,7 @@ abstract class SnowballStemmer {
             return false;
         }
         $ch -= $min;
-        if( $s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7)) === 0 ){
+        if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) === 0 ){
             return false;
         }
         $this->cursor++;
@@ -74,7 +74,7 @@ abstract class SnowballStemmer {
                 return true;
             }
             $ch -= $min;
-            if( $s[self::unsignedShiftRight($ch,3)] & (0x1 << ($ch & 0x7)) === 0 ){
+            if( ($s[self::unsignedShiftRight($ch,3)] & (0x1 << ($ch & 0x7))) === 0 ){
                 return true;
             }
             $this->cursor++;
@@ -96,7 +96,7 @@ abstract class SnowballStemmer {
             return false;
         }
         $ch -= $min;
-        if( $s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7)) === 0 ){
+        if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) === 0 ){
             return false;
         }
         $this->cursor--;
@@ -114,7 +114,7 @@ abstract class SnowballStemmer {
                 return true;
             }
             $ch -= $min;
-            if( $s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7)) === 0){
+            if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) === 0){
                 return true;
             }
             $this->cursor--;
@@ -136,7 +136,7 @@ abstract class SnowballStemmer {
             return true;
         }
         $ch -= $min;
-        if( $s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7)) === 0) {
+        if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) === 0) {
             $this->cursor++;
             return true;
         }
@@ -152,7 +152,7 @@ abstract class SnowballStemmer {
             $ch = $this->currentCharCodeAt($this->cursor);
             if ($ch <= $max && $ch >= $min) {
                 $ch -= $min;
-                if( $s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7)) !== 0 ) {
+                if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) !== 0 ) {
                     return true;
                 }
             }
@@ -175,7 +175,7 @@ abstract class SnowballStemmer {
             return true;
         }
         $ch -= $min;
-        if( $s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7)) === 0 ) {
+        if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) === 0 ) {
             $this->cursor--;
             return true;
         }
@@ -191,7 +191,7 @@ abstract class SnowballStemmer {
             $ch = $this->currentCharCodeAt($this->cursor - 1);
             if ($ch <= $max && $ch >= $min) {
                 $ch -= $min;
-                if( $s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7)) !== 0) {
+                if( ($s[ self::unsignedShiftRight($ch,3) ] & (0x1 << ($ch & 0x7))) !== 0) {
                     return true;
                 }
             }
