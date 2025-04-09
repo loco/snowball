@@ -514,7 +514,7 @@ abstract class SnowballStemmer {
             $end = max(0, self::lengthOf($s)+$end );
         }
         if( $end < $start ){
-            throw new RangeException;
+            return '';
         }
         return mb_substr( $s, $start, $end-$start, 'UTF-8');
     }
