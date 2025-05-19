@@ -821,6 +821,7 @@ static void generate_address(struct generator * g, struct node * p) {
     if (b != NULL) {
         write_literal_string(g, b);
     } else {
+        write_string(g,"$this->");
         write_varref(g, p->name);
     }
 }
