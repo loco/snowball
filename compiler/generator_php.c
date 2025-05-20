@@ -969,13 +969,12 @@ static void generate_dollar(struct generator * g, struct node * p) {
     struct str * savevar = vars_newname(g);
     g->B[0] = str_data(savevar);
     writef(g, "~{~C~N"
-              "~M$~B0 = new ~P(); /*TODO Should parent_class_name be self?*/ ~N", p);
-    writef(g, "~M$~B0->copy_from(base);~N", p);
+              "~M$~B0 = clone $this~N", p);
 
     ++g->copy_from_count;
-    str_assign(g->failure_str, "$this->copy_from(");
+    str_assign(g->failure_str, "clone ");
     str_append(g->failure_str, savevar);
-    str_append_string(g->failure_str, ");");
+    str_append_string(g->failure_str, ";");
     g->V[0] = p->name;
     writef(g, "~M$this->current = $~V0;~N"
               "~M$this->cursor = 0;~N"
