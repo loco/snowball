@@ -720,7 +720,19 @@ do_check_php: $(libstemmer_algorithms:%=check_php_%)
 check_php_%: export PHP_PATH=$(php_output_dir)
 check_php_%: $(STEMMING_DATA)/%
 	@echo "Checking output of $* stemmer for PHP"
-	$(PHP) -f php/stemwords.php -- $*
+	@if test -f '$</voc.txt.gz' ; then \
+	  gzip -dc '$</voc.txt.gz' > tmp.in; \
+	  $(PHP) php/stemwords.php $* < tmp.in > tmp.txt; \
+	  rm tmp.in; \
+	else \
+	  $(PHP) php/stemwords.php $* < $</voc.txt > tmp.txt; \
+	fi
+	@if test -f '$</output.txt.gz' ; then \
+	  gzip -dc '$</output.txt.gz'|$(DIFF) -u - tmp.txt; \
+	else \
+	  $(DIFF) -u $</output.txt tmp.txt; \
+	fi
+	@rm tmp.txt
 
 ###############################################################################
 # Rust
