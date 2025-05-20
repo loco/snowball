@@ -34,16 +34,6 @@ abstract class SnowballStemmer {
     }
 
 
-    protected function copy_from( self $other):void {
-        $this->current = $other->current;
-        $this->cursor = $other->cursor;
-        $this->limit = $other->limit;
-        $this->limit_backward = $other->limit_backward;
-        $this->bra = $other->bra;
-        $this->ket = $other->ket;
-    }
-
-
     /**
      * @param int[] $s
      */
@@ -335,9 +325,9 @@ abstract class SnowballStemmer {
                     break;
                 }
                 // NaN ??
-                $offset = $c-1-$common;
-                $codeA = $this->currentCharCodeAt($offset);
-                $codeB = self::charCodeAt($w[0],$i2);
+                //$offset = $c-1-$common;
+                //$codeA = $this->currentCharCodeAt($offset);
+                //$codeB = self::charCodeAt($w[0],$i2);
                 //printf("console.log( 'A: '+%s, String(%1\$s).charCodeAt(%d-1-%d), %d )\n", json_encode($this->current), $c, $common, $codeA );
                 //printf("console.log( 'B: '+%s, String(%1\$s).charCodeAt(%d), %d )\n", json_encode($w[0]), $i2, $codeB );
                 $diff = $this->currentCharCodeAt($c - 1 - $common) - self::charCodeAt($w[0],$i2);
@@ -470,12 +460,12 @@ abstract class SnowballStemmer {
      * TODO emulate JavaScript ">>>" properly.
      * PHP has no unsigned shift right operator.
      * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift
+     * @throws InvalidArgumentException
      */
     public static function unsignedShiftRight( int $x, int $y ):int {
         if(  $x < 0 ){
-            throw new Exception('TODO handle right shift of unsigned integers?');
+            throw new InvalidArgumentException('TODO handle right shift of unsigned integers?');
         }
-        //printf("console.log( %d >>> %d, %d );\n", $x, $y, $x>>$y);
         return $x >> $y;
     }
 
@@ -490,6 +480,7 @@ abstract class SnowballStemmer {
 
     /**
      * As per String.prototype.charCodeAt
+     * @throws RangeException
      */
     public static function charCodeAt( string $s, int $offset ):int {
         $c = mb_substr($s,$offset,1,'UTF-8');
