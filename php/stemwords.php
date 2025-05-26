@@ -1,15 +1,10 @@
 <?php
 /*
- * Test vocab files from snowball-data
+ * For testing vocab files from snowball-data
  * run `make check_php`
  */
 
-/*[ , $lang, $infile, $outfile ] = $argv;
-if( ! file_exists($infile) ){
-    fwrite(STDERR, "Vocab file does not exist at $infile\n" );
-}*/
-
-$lang = $argv[1];
+$lang = $argv[1] ?? 'english';
 $parent = realpath(__DIR__.'/..');
 $phpfile = $parent.'/php_out/'.$lang.'-stemmer.php';
 if( ! file_exists($phpfile) ){
@@ -20,8 +15,7 @@ if( ! file_exists($phpfile) ){
 require __DIR__.'/base-stemmer.php';
 require $phpfile;
 
-
-$class = 'Snowball'.ucfirst($lang).'Stemmer';
+$class = 'Snowball'.implode( '', array_map( 'ucfirst', explode('_',$lang) ) ).'Stemmer';
 if( ! class_exists($class) ){
     fwrite(STDERR, "$class not included from $phpfile\n");
 }
@@ -32,11 +26,10 @@ fwrite(STDERR,"Waiting for stdin...\n");
 $in = fopen('php://stdin', 'r');
 fwrite(STDERR,"Stemming $lang...\n");
 while( $word = fgets($in) ) {
-    fwrite(STDERR,"$word | ");
     $word = rtrim($word, "\n");
     $stem = $stemmer->stemWord($word);
-    echo $word,"\n";
+    //fwrite(STDERR,"$word => $stem\n");
+    echo $stem,"\n";
 }
 fwrite(STDERR,"Done\n");
 fclose($in);
-exit(0);  
