@@ -1118,7 +1118,7 @@ static void generate_substring(struct generator * g, struct node * p) {
         writef(g, "~M$this->find_among~S0($this->a_~I0);~N", p);
     } else if (x->command_count == 0 &&
                x->node->right && x->node->right->type == c_functionend) {
-        writef(g, "~Mreturn $this->find_among~S0(a_~I0) != 0;~N", p);
+        writef(g, "~Mreturn $this->find_among~S0($this->a_~I0) != 0;~N", p);
         x->node->right = NULL;
         g->unreachable = true;
     } else {
@@ -1301,8 +1301,9 @@ static void generate_among_table(struct generator * g, struct among * x) {
         write_literal_string(g, v[i].b);
         w(g, ", ~I0, ~I1");
         if (v[i].function != NULL) {
-            w(g, ", ");
-            write_varname(g, v[i].function);
+            w(g, ", '");
+            write_varname(g, v[i].function); // callable
+            w(g, "'");
         }
         w(g, "]~S0~N");
     }
