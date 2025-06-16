@@ -202,7 +202,7 @@ abstract class SnowballStemmer {
 
 
     protected function eq_s( string $s ):bool {
-        $slength = self::lengthOf($s);
+        $slength = strlen($s);
         if ($this->limit - $this->cursor < $slength ){
             return false;
         }
@@ -215,7 +215,7 @@ abstract class SnowballStemmer {
 
 
     protected function eq_s_b( string $s ):bool {
-        $slength = self::lengthOf($s);
+        $slength = strlen($s);
         if ($this->cursor - $this->limit_backward < $slength){
             return false;
         }
@@ -248,7 +248,7 @@ abstract class SnowballStemmer {
             $common = min($common_i, $common_j); // smaller
             // w[0]: string, w[1]: substring_i, w[2]: result, w[3]: function (optional)
             $w = $v[$k];
-            $w0length = self::lengthOf($w[0]);
+            $w0length = strlen($w[0]);
             for( $i2 = $common; $i2 < $w0length; $i2++ ){
                 if ( $c + $common === $l){
                     $diff = -1;
@@ -290,7 +290,7 @@ abstract class SnowballStemmer {
         }
         do {
             $w = $v[$i];
-            $w0length = self::lengthOf($w[0]);
+            $w0length = strlen($w[0]);
             if( $common_i >= $w0length ) {
                 $this->cursor = $c + $w0length;
                 if ( count($w) < 4){
@@ -328,7 +328,7 @@ abstract class SnowballStemmer {
             $diff = 0;
             $common = min($common_i, $common_j);
             $w = $v[$k];
-            $w0length = self::lengthOf($w[0]);
+            $w0length = strlen($w[0]);
             for ( $i2 = $w0length - 1 - $common; $i2 >= 0; $i2-- ){
                 if ($c - $common == $lb){
                     $diff = -1;
@@ -357,7 +357,7 @@ abstract class SnowballStemmer {
         }
         do {
             $w = $v[$i];
-            $w0length = self::lengthOf($w[0]);
+            $w0length = strlen($w[0]);
             if ( $common_i >= $w0length ){
                 $this->cursor = $c - $w0length;
                 if ( count($w) < 4){
@@ -379,7 +379,7 @@ abstract class SnowballStemmer {
      * to replace chars between $c_bra and $c_ket in $this->current by the chars in $s.
      */
     private function replace_s( int $c_bra, int $c_ket, string $s ):int {
-        $slength = self::lengthOf($s);
+        $slength = strlen($s);
         $adjustment = $slength - ($c_ket - $c_bra);
         $this->current = $this->currentSlice(0,$c_bra) . $s . $this->currentSlice($c_ket);
         $this->limit += $adjustment;
@@ -442,7 +442,7 @@ abstract class SnowballStemmer {
     }
     
     protected function currentLength():int {
-        return self::lengthOf( $this->current );
+        return strlen( $this->current );
     }
     
 
@@ -456,23 +456,15 @@ abstract class SnowballStemmer {
 
 
     /**
-     * As per String.prototype.length
-     */
-    public static function lengthOf( string $s ):int {
-        return mb_strlen($s,'UTF-8');
-    }
-
-
-    /**
      * As per String.prototype.charCodeAt
      * @throws RangeException
      */
     public static function charCodeAt( string $s, int $offset ):int {
-        $c = mb_substr($s,$offset,1,'UTF-8');
+        $c = substr($s,$offset,1);
         if( '' === $c ){
             throw new RangeException('Bad character offset');
         }
-        return IntlChar::ord($c);
+        return ord($c);
     }
 
 
@@ -481,18 +473,18 @@ abstract class SnowballStemmer {
      */
     public static function strSlice( string $s, int $start, ?int $end = null ):string {
         if( is_null($end) ){
-            return mb_substr($s,$start,null,'UTF-8');
+            return substr($s,$start);
         }
         if( $start < 0 ){
-            $start = max(0, self::lengthOf($s)+$start );
+            $start = max(0, strlen($s)+$start );
         }
         if( $end < 0 ){
-            $end = max(0, self::lengthOf($s)+$end );
+            $end = max(0, strlen($s)+$end );
         }
         if( $end < $start ){
             return '';
         }
-        return mb_substr( $s, $start, $end-$start, 'UTF-8');
+        return substr( $s, $start, $end-$start);
     }
     
 

@@ -285,7 +285,7 @@ static void generate_AE(struct generator * g, struct node * p) {
         // This is modelled on JavaScript, so will treat string length as Uniode characters, not bytes.
         case c_lenof:
         case c_sizeof:
-            writef(g, "parent::lengthOf($~V)",p);
+            writef(g, "strlen($~V)",p);
             break;
         case c_len:
         case c_size:
